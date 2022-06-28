@@ -6,13 +6,15 @@ import {
   SubscriberEntity,
   JobEntity,
   JobStatusEnum,
+  JobRepository,
 } from '@novu/dal';
-import { LogCodeEnum, LogStatusEnum } from '@novu/shared';
+import { ChannelTypeEnum, LogCodeEnum, LogStatusEnum } from '@novu/shared';
 import { CreateSubscriber, CreateSubscriberCommand } from '../../../subscribers/usecases/create-subscriber';
 import { CreateLog } from '../../../logs/usecases/create-log/create-log.usecase';
 import { CreateLogCommand } from '../../../logs/usecases/create-log/create-log.command';
 import { ProcessSubscriberCommand } from './process-subscriber.command';
 import { matchMessageWithFilters } from '../trigger-event/message-filter.matcher';
+import moment from 'moment';
 
 @Injectable()
 export class ProcessSubscriber {
@@ -21,7 +23,8 @@ export class ProcessSubscriber {
     private notificationRepository: NotificationRepository,
     private createSubscriberUsecase: CreateSubscriber,
     private createLogUsecase: CreateLog,
-    private notificationTemplateRepository: NotificationTemplateRepository
+    private notificationTemplateRepository: NotificationTemplateRepository,
+    private jobRepository: JobRepository
   ) {}
 
   public async execute(command: ProcessSubscriberCommand): Promise<JobEntity[]> {
@@ -34,10 +37,26 @@ export class ProcessSubscriber {
 
     const notification = await this.createNotification(command, template._id, subscriber);
 
-    const steps = matchMessageWithFilters(
+    let steps = matchMessageWithFilters(
       template.steps.filter((step) => step.active === true),
       command.payload
     );
+
+    const digests = steps.filter((step) => step.template.type === ChannelTypeEnum.DIGEST_BACKOFF);
+
+    if (digests.length > 0) {
+      const earliest = moment().subtract(10, 'minutes').toDate();
+      const jobs = await this.jobRepository.find({
+        updatedAt: {
+          $gte: earliest,
+        },
+        status: JobStatusEnum.COMPLETED,
+      });
+
+      if (jobs.length === 0) {
+        steps = steps.filter((step) => step.template.type !== ChannelTypeEnum.DIGEST_BACKOFF);
+      }
+    }
 
     await this.createLogUsecase.execute(
       CreateLogCommand.create({
