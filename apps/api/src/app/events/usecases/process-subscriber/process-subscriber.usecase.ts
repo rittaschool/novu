@@ -42,7 +42,7 @@ export class ProcessSubscriber {
       command.payload
     );
 
-    const digests = steps.filter((step) => step.template.type === ChannelTypeEnum.DIGEST_BACKOFF);
+    const digests = steps.filter((step) => step.template.type === ChannelTypeEnum.DIGEST);
 
     if (digests.length > 0) {
       const earliest = moment().subtract(10, 'minutes').toDate();
@@ -54,7 +54,7 @@ export class ProcessSubscriber {
       });
 
       if (jobs.length === 0) {
-        steps = steps.filter((step) => step.template.type !== ChannelTypeEnum.DIGEST_BACKOFF);
+        steps = steps.filter((step) => step.template.type !== ChannelTypeEnum.DIGEST);
       }
     }
 
