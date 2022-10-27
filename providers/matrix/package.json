@@ -1,12 +1,7 @@
----
-    to: providers/<%= name %>/package.json
----
-
-
 {
-  "name": "@novu/<%= name %>",
+  "name": "@novu/matrix",
   "version": "",
-  "description": "A <%= name %> wrapper for novu",
+  "description": "A matrix wrapper for novu",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
@@ -37,7 +32,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@novu/stateless": "^0.8.0"
+    "@novu/stateless": "^0.4.1"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
