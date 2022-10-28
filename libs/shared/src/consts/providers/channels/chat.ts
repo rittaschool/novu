@@ -1,7 +1,7 @@
-import { IConfigCredentials, IProviderConfig } from '../provider.interface';
 import { ChannelTypeEnum } from '../../../entities/message-template';
-import { slackConfig } from '../credentials';
+import { matrixConfig, slackConfig } from '../credentials';
 import { ChatProviderIdEnum } from '../provider.enum';
+import { IConfigCredentials, IProviderConfig } from '../provider.interface';
 
 export const chatProviders: IProviderConfig[] = [
   {
@@ -19,5 +19,13 @@ export const chatProviders: IProviderConfig[] = [
     credentials: [] as IConfigCredentials[],
     docReference: 'https://discord.com/developers/docs/intro',
     logoFileName: { light: 'discord.svg', dark: 'discord.svg' },
+  },
+  {
+    id: ChatProviderIdEnum.Matrix,
+    displayName: 'Matrix',
+    channel: ChannelTypeEnum.CHAT,
+    credentials: matrixConfig,
+    docReference: 'https://coming.soon',
+    logoFileName: { light: '', dark: '' },
   },
 ];

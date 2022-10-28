@@ -49,6 +49,7 @@ export enum SmsProviderIdEnum {
 export enum ChatProviderIdEnum {
   Slack = 'slack',
   Discord = 'discord',
+  Matrix = 'matrix',
 }
 
 export enum PushProviderIdEnum {
